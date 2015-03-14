@@ -189,18 +189,25 @@ lunr.tokenizer = function (obj) {
     }
   }
 
+  // necessary to index the whole camelcase, etc., string,
+  // as well as its parts
+  var fullLengthTokens = str.split(/\s+/);
+
   return str
     .replace(/[^a-zA-Z\s]/g, ' ')
     .replace(/[A-Z]{2,}(?![a-z])/g, ' $& ')
     .replace(/[A-Z](?=[a-z])/g, ' $&')
     .replace(/^\s+|\s+$/g, '')
     .split(/\s+/)
-    .filter(function (token) {
-      return !!token
-    })
+    .concat(fullLengthTokens)
     .map(function (token) {
-      return token.toLowerCase()
+      return token.toLowerCase();
     })
+    .reduce(function(acc, token) {
+      if (acc.indexOf(token) < 0) 
+        acc.push(token);
+      return acc;
+    }, []);
 }
 /*!
  * lunr.Pipeline
